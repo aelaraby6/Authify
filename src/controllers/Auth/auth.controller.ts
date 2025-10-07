@@ -100,7 +100,8 @@ export const LoginController = async (
       throw new UnAuthorizedError("Invalid credentials");
     }
 
-    const isPasswordValid = await ComparePassword(password, user.password);
+    const isPasswordValid: boolean = await ComparePassword(password, user.password);
+    
     if (!isPasswordValid) {
       throw new UnAuthorizedError("Invalid credentials");
     }
