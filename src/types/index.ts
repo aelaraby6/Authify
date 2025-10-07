@@ -11,6 +11,10 @@ export interface IUser extends Document {
   role: string;
   is_deleted: boolean;
   is_active: boolean;
+  isMfaActive?: boolean;
+  twoFactorSecret?: string;
+  resetOTP?: string;
+  otpExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

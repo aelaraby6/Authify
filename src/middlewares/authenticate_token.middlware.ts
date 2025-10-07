@@ -1,11 +1,10 @@
 import { verifyToken } from "@/services/jwt.service";
 import User from "@/models/User/user.model";
 import { UnAuthorizedError } from "@/Errors/error";
-import { Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "@/types/index";
+import { Request, Response, NextFunction } from "express";
 
 export const authenticateToken = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -30,7 +29,8 @@ export const authenticateToken = async (
       throw new UnAuthorizedError("Invalid or expired Token");
     }
 
-    req.user = user;
+    (req as any).user = user;
+    
     next();
   } catch (error) {
     next(error);
