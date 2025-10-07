@@ -2,16 +2,16 @@ import { Router } from "express";
 import {
   signupLimiter,
   loginLimiter,
-} from "@/middlewares/rate_limiter.middleware.js";
+} from "@/middlewares/rate_limiter.middleware";
 import {
   SignUpController,
   LoginController,
-} from "@/controllers/Auth/auth.controller.js";
+} from "@/controllers/Auth/auth.controller";
 import {
   SignUpSchema,
   LoginSchema,
-} from "@/validations/Auth/auth.validation.js";
-import { validate } from "@/middlewares/validate.middleware.js";
+} from "@/validations/Auth/auth.validation";
+import { validate } from "@/middlewares/validate.middleware";
 
 const router = Router();
 

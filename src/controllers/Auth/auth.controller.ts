@@ -1,7 +1,7 @@
-import { BadRequestError, UnAuthorizedError } from "@/Errors/error.js";
-import { generateToken } from "@/services/jwt.service.js";
-import User from "@/models/User/user.model.js";
-import { ComparePassword, hashPassword } from "@/services/password.service.js";
+import { BadRequestError, UnAuthorizedError } from "@/Errors/error";
+import { generateToken } from "@/services/jwt.service";
+import User from "@/models/User/user.model";
+import { ComparePassword, hashPassword } from "@/services/password.service";
 import { Request, Response, NextFunction } from "express";
 
 // Signup Controller

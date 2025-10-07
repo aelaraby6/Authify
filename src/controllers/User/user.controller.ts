@@ -1,7 +1,7 @@
-import { NotFoundError } from "@/Errors/error.js";
-import User from "@/models/User/user.model.js";
+import { NotFoundError } from "@/Errors/error";
+import User from "@/models/User/user.model";
 import { Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "@/types/index.js";
+import { AuthenticatedRequest } from "@/types/index";
 
 export const GetUserProfileController = async (
   req: AuthenticatedRequest,

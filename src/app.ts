@@ -1,10 +1,10 @@
 import express, { Application } from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { corsOptions } from "@/config/corsOptions.js";
-import { ApiRouter } from "@/routers/index.js";
-import globalErrorHandler from "@/middlewares/global_error_handler.middleware.js";
-import { notFoundMiddleware } from "@/middlewares/not_found.middleware.js";
+import { corsOptions } from "@/config/corsOptions";
+import { ApiRouter } from "@/routers/index";
+import globalErrorHandler from "@/middlewares/global_error_handler.middleware";
+import { notFoundMiddleware } from "@/middlewares/not_found.middleware";
 
 const app: Application = express();
 

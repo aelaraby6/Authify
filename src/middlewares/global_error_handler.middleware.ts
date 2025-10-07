@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { CustomError } from "@/types/index.js";
+import { CustomError } from "@/types/index";
 
 interface ErrorResponse {
   status: number;

@@ -1,4 +1,4 @@
-import { BadRequestError } from "@/Errors/error.js";
+import { BadRequestError } from "@/Errors/error";
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
 

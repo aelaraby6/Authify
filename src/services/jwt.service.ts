@@ -1,6 +1,6 @@
 import Jwt from "jsonwebtoken";
-import { UnAuthorizedError } from "@/Errors/error.js";
-import { IJWTPayload } from "@/types/index.js";
+import { UnAuthorizedError } from "@/Errors/error";
+import { IJWTPayload } from "@/types/index";
 
 export const generateToken = (
   name: string,

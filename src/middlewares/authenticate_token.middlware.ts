@@ -1,8 +1,8 @@
-import { verifyToken } from "@/services/jwt.service.js";
-import User from "@/models/User/user.model.js";
-import { UnAuthorizedError } from "@/Errors/error.js";
+import { verifyToken } from "@/services/jwt.service";
+import User from "@/models/User/user.model";
+import { UnAuthorizedError } from "@/Errors/error";
 import { Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "@/types/index.js";
+import { AuthenticatedRequest } from "@/types/index";
 
 export const authenticateToken = async (
   req: AuthenticatedRequest,

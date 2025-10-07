@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { BadRequestError } from "@/Errors/error.js";
+import { BadRequestError } from "@/Errors/error";
 
 export const validateObjectId = (
   id: string,

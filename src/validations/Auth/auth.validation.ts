@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ROLES , DEFAULT_ROLE } from "@/utils/constants.js";
+import { ROLES , DEFAULT_ROLE } from "@/utils/constants";
 
 // Signup
 export const SignUpSchema = Joi.object({

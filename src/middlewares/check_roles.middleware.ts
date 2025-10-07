@@ -1,6 +1,6 @@
-import { ForbiddenError, UnAuthorizedError } from "@/Errors/error.js";
+import { ForbiddenError, UnAuthorizedError } from "@/Errors/error";
 import { Response, NextFunction } from "express";
-import { AuthenticatedRequest } from "@/types/index.js";
+import { AuthenticatedRequest } from "@/types/index";
 
 export const checkRole = (allowedRoles: string[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
