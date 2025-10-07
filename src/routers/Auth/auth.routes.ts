@@ -6,6 +6,8 @@ import {
 import {
   SignUpController,
   LoginController,
+  RefreshTokenController,
+  LogoutController,
 } from "@/controllers/Auth/auth.controller";
 import {
   SignUpSchema,
@@ -17,5 +19,10 @@ const router = Router();
 
 router.post("/signup", signupLimiter, validate(SignUpSchema), SignUpController);
 router.post("/login", loginLimiter, validate(LoginSchema), LoginController);
+
+router.post("/refresh", RefreshTokenController);
+
+router.post("/logout", LogoutController);
+
 
 export { router as AuthRouter };

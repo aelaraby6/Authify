@@ -5,6 +5,7 @@ import { corsOptions } from "@/config/corsOptions";
 import { ApiRouter } from "@/routers/index";
 import globalErrorHandler from "@/middlewares/global_error_handler.middleware";
 import { notFoundMiddleware } from "@/middlewares/not_found.middleware";
+import cookieParser from "cookie-parser";
 
 const app: Application = express();
 
@@ -12,6 +13,7 @@ const app: Application = express();
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api", ApiRouter);
 
