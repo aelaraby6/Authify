@@ -35,6 +35,23 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isMfaActive: {
+      type: Boolean,
+      required: false,
+    },
+    twoFactorSecret: {
+      type: String,
+    },
+    resetOTP: {
+      type: String
+    },
+    otpExpires: {
+      type: Date
+    },
+    isVerifiedForReset: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,
