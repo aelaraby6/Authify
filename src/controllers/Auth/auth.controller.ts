@@ -96,7 +96,7 @@ export const SignUpController = async (
     res.status(201).json({
       message: "User registered successfully",
       data: userResponse,
-      accessToken,
+      token: accessToken,
     });
   } catch (error) {
     next(error);
