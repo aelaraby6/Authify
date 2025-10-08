@@ -8,25 +8,53 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     email: {
       type: String,
       unique: true,
-      required: true,
+      sparse: true,
+      required: false,
     },
+
     password: {
       type: String,
-      required: true,
+      required: false,
     },
+
     phone: {
       type: String,
       required: false,
     },
+
     role: {
       type: String,
       enum: Object.values(ROLES),
       default: DEFAULT_ROLE,
       required: true,
     },
+
+    githubId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    avatar: {
+      type: String,
+    },
+
+    provider: {
+      type: String,
+      enum: ["local", "github", "google"], 
+      default: "local",
+    },
+
     is_deleted: {
       type: Boolean,
       default: false,
@@ -35,6 +63,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
     isMfaActive: {
       type: Boolean,
       required: false,
@@ -43,15 +72,15 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     resetOTP: {
-      type: String
+      type: String,
     },
     otpExpires: {
-      type: Date
+      type: Date,
     },
     isVerifiedForReset: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   {
     timestamps: true,
