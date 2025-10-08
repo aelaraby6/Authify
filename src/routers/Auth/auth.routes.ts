@@ -27,6 +27,7 @@ import {
 } from "@/validations/Auth/auth.validation";
 import { validate } from "@/middlewares/validate.middleware";
 import passport from "passport";
+import { authenticateToken } from "@/middlewares/authenticate_token.middlware";
 
 const router = Router();
 
@@ -86,7 +87,7 @@ router.post(
 // Update Password (requires authentication)
 router.post(
   "/update-password",
-  authenticateSession,
+  authenticateToken,
   validate(UpdatePasswordSchema),
   updatePasswordController
 );
