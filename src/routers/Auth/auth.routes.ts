@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Request, Response, NextFunction, Router } from "express";
 import {
   signupLimiter,
   loginLimiter,
@@ -16,6 +16,7 @@ import {
   resetPasswordController,
   updatePasswordController,
 } from "@/controllers/Auth/auth.controller";
+import { authenticateSession } from "@/middlewares/authenticate_session.middleware";
 import {
   SignUpSchema,
   LoginSchema,
@@ -25,7 +26,6 @@ import {
   UpdatePasswordSchema,
 } from "@/validations/Auth/auth.validation";
 import { validate } from "@/middlewares/validate.middleware";
-import { authenticateToken } from "@/middlewares/authenticate_token.middlware";
 import passport from "passport";
 
 const router = Router();
@@ -48,13 +48,23 @@ router.post("/login", loginLimiter, validate(LoginSchema), (req, res, next) => {
           message: info?.message || "Invalid credentials",
         });
       }
-      req.user = user;
-      return LoginController(req, res, next);
+
+      // Establish session
+      req.login(user, (err) => {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: "Session error",
+            error: err.message,
+          });
+        }
+        return LoginController(req, res, next);
+      });
     }
   )(req, res, next);
 });
-router.get("/status", authStatusController);
-router.post("/logout", logoutController);
+router.get("/status", authenticateSession, authStatusController);
+router.post("/logout", authenticateSession, logoutController);
 
 // Password Reset Routes
 router.post(
@@ -76,14 +86,14 @@ router.post(
 // Update Password (requires authentication)
 router.post(
   "/update-password",
-  authenticateToken,
+  authenticateSession,
   validate(UpdatePasswordSchema),
   updatePasswordController
 );
 
 // 2FA Routes
-router.post("/2FA/setup", twoFASetupController);
-router.post("/2FA/verify", twoFAVerifyController);
-router.post("/2FA/reset", twoFAResetController);
+router.post("/2FA/setup", authenticateSession, twoFASetupController);
+router.post("/2FA/verify", authenticateSession, twoFAVerifyController);
+router.post("/2FA/reset", authenticateSession, twoFAResetController);
 
 export { router as AuthRouter };

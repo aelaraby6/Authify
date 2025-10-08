@@ -8,7 +8,15 @@ import { ComparePassword, hashPassword } from "@/services/password.service";
 import { Request, Response, NextFunction } from "express";
 import { generateOTP, expireOTP } from "@/services/otp.service";
 import { sendOTPEmail } from "@/services/email.service";
-import { generateAccessToken, generateTokens, verifyRefreshToken } from "@/services/jwt.service";
+import {
+  generateAccessToken,
+  generateTokens,
+  verifyRefreshToken,
+} from "@/services/jwt.service";
+import { calcTime } from "@/helper/calcTime";
+import speakeasy from "speakeasy";
+import qrcode from "qrcode";
+import Jwt from "jsonwebtoken";
 
 // Signup Controller
 export const SignUpController = async (
@@ -74,7 +82,7 @@ export const SignUpController = async (
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: calcTime(7, "day"),
     });
 
     const userResponse = {
@@ -103,13 +111,27 @@ export const LoginController = async (
 ) => {
   const user = req.user as any;
 
-  const { accessToken, refreshToken } = generateTokens(user);
+  const payload = {
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    _id: user._id.toString(),
+    role: user.role,
+  };
+
+  const { accessToken, refreshToken } = generateTokens(payload);
+
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: calcTime(7, "day"),
+  });
 
   res.status(200).json({
     message: "Login successful",
     data: user,
-    accessToken,
-    refreshToken,
+    token: accessToken,
   });
 };
 
@@ -117,26 +139,148 @@ export const authStatusController = async (req: Request, res: Response) => {
   if (!req.user) {
     return res.status(200).json({ message: "Not Authenticated", data: null });
   }
-  res.status(200).json({ message: "Auth status", data: req.user });
+  res.status(200).json({ message: "user authenticated", data: req.user });
 };
 
-export const logoutController = async (req: Request, res: Response) => {
+export const logoutController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return res.status(200).json({ message: "Not Authenticated", data: null });
   }
-  req.logout((err) => {
-    if (err) {
-      return res.status(401).json({ message: "Unauthorized user", error: err });
-    }
-    res.status(200).json({ message: "Logout successful", data: null });
-  });
+
+  try {
+    req.logout((err) => {
+      if (err) {
+        console.error("Passport logout error:", err);
+        return res
+          .status(401)
+          .json({ message: "Unauthorized user", error: err });
+      }
+
+      res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+      });
+
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+      });
+
+      req.session.destroy((sessionErr) => {
+        if (sessionErr) {
+          console.error("Session destruction error:", sessionErr);
+          return res.status(500).json({
+            message: "Error destroying session",
+            error: sessionErr,
+          });
+        }
+
+        res.status(200).json({
+          message: "Logout successfully",
+          data: null,
+        });
+      });
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    next(error);
+  }
 };
 
-export const twoFASetupController = async (req: Request, res: Response) => {};
+export const twoFASetupController = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as any;
 
-export const twoFAVerifyController = async (req: Request, res: Response) => {};
+    // Generate a new secret
+    const secret = speakeasy.generateSecret({
+      name: `Authify (${user.email})`,
+      issuer: "Authify",
+      length: 32,
+    });
 
-export const twoFAResetController = async (req: Request, res: Response) => {};
+    // Save the secret to the user
+    user.twoFactorSecret = secret.base32;
+    user.isMfaActive = true;
+    await user.save();
+
+    // Generate QR code URL
+    const url = speakeasy.otpauthURL({
+      secret: secret.base32,
+      label: `Authify (${user.email})`,
+      issuer: "Authify",
+      encoding: "base32",
+    });
+
+    // Generate QR code
+    const qrCodeDataURL = await qrcode.toDataURL(url);
+
+    res.status(200).json({
+      message: "2FA setup successful",
+      secret: secret.base32,
+      qrCodeDataURL,
+      manualEntryKey: secret.base32, // For manual entry in authenticator apps
+    });
+  } catch (err) {
+    console.error("Error setting up 2FA:", err);
+    res.status(500).json({ message: "Error setting up 2FA", error: err });
+  }
+};
+
+export const twoFAVerifyController = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.body;
+    const user = req.user as any;
+
+    if (!token) {
+      return res.status(400).json({ message: "2FA token is required" });
+    }
+
+    if (!user.twoFactorSecret) {
+      return res.status(400).json({ message: "2FA not set up for this user" });
+    }
+
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: "base32",
+      token: token.toString(), // Ensure token is string
+      window: 2, // Allow 2 time steps of tolerance (60 seconds before and after)
+    });
+
+    if (verified) {
+      const jwtToken = Jwt.sign(
+        { name: user.name },
+        process.env.ACCESS_TOKEN_SECRET as string,
+        { expiresIn: "1hr" }
+      );
+      res.status(200).json({ message: "2FA verified", token: jwtToken });
+    } else {
+      res.status(400).json({ message: "Invalid 2FA token" });
+    }
+  } catch (error) {
+    console.error("2FA Verification Error:", error);
+    res.status(500).json({ message: "Error verifying 2FA token" });
+  }
+};
+
+export const twoFAResetController = async (req: Request, res: Response) => {
+  try {
+    const user = req.user as any;
+    user.twoFactorSecret = "";
+    user.isMfaActive = false;
+    await user.save();
+    res.status(200).json({ message: "2FA reset successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Error resetting 2FA" });
+  }
+};
 
 // Forgot Password Controller
 export const forgotPasswordController = async (
@@ -378,67 +522,3 @@ export const RefreshTokenController = async (
     next(error);
   }
 };
-
-// Login Controller
-// export const LoginController = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { email, password } = req.body;
-
-//     if (!email || !password) {
-//       throw new BadRequestError("Email and password are required");
-//     }
-
-//     const user = await User.findOne({ email: email.toLowerCase() });
-
-//     if (!user || user.is_deleted || !user.is_active) {
-//       throw new UnAuthorizedError("Invalid credentials");
-//     }
-
-//     const isPasswordValid: boolean = await ComparePassword(
-//       password,
-//       user.password
-//     );
-//     if (!isPasswordValid) {
-//       throw new UnAuthorizedError("Invalid credentials");
-//     }
-
-//     const payload = {
-//       name: user.name,
-//       email: user.email,
-//       phone: user.phone,
-//       _id: user._id.toString(),
-//       role: user.role,
-//     };
-
-//     const { accessToken, refreshToken } = generateTokens(payload);
-
-//     // Store refresh token in cookie
-//     res.cookie("refreshToken", refreshToken, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === "production",
-//       sameSite: "strict",
-//       maxAge: 7 * 24 * 60 * 60 * 1000,
-//     });
-
-//     const userResponse = {
-//       ...user.toObject(),
-//       password: undefined,
-//       __v: undefined,
-//       is_deleted: undefined,
-//       is_active: undefined,
-//     };
-
-//     res.status(200).json({
-//       message: "Login successful",
-//       data: userResponse,
-//       accessToken,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
