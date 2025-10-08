@@ -97,4 +97,67 @@ router.post("/2FA/setup", authenticateSession, twoFASetupController);
 router.post("/2FA/verify", authenticateSession, twoFAVerifyController);
 router.post("/2FA/reset", authenticateSession, twoFAResetController);
 
+// Auth With Github
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] })
+);
+
+router.get(
+  "/github/callback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  (req, res) => {
+    const { accessToken, refreshToken, user }: any = req.user;
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "GitHub login successful",
+      accessToken,
+      user,
+    });
+  }
+);
+
+// Auth With Google
+
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    session: false,
+  }),
+  async (req, res) => {
+    try {
+      const { accessToken, refreshToken, user }: any = req.user;
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Google login successful",
+        accessToken,
+        user,
+      });
+    } catch (error) {
+      console.error("Error in Google callback:", error);
+      res.status(500).json({ success: false, message: "Google login failed" });
+    }
+  }
+);
+
 export { router as AuthRouter };

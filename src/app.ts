@@ -9,6 +9,8 @@ import session from 'express-session';
 import passport from 'passport';
 import "@/config/passportConfig";
 import { loadSessionConfig } from "@/helper/sessionhelper";
+import cookieParser from "cookie-parser";
+
 
 const app: Application = express();
 
@@ -22,6 +24,8 @@ app.use(session(loadSessionConfig()));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(cookieParser());
 
 app.use("/api", ApiRouter);
 
