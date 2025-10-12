@@ -14,7 +14,7 @@ export const DataSource = {
   DefaultError: "DefaultError",
 } as const;
 
-export type DataSource = typeof DataSource[keyof typeof DataSource];
+export type DataSource = (typeof DataSource)[keyof typeof DataSource];
 
 // ---- Response Codes ----
 export const ResponseCode = {
@@ -119,5 +119,31 @@ export function getFailure(source: DataSource): ApiErrorModel {
         code: ResponseCode.defaultError,
         message: ResponseMessage.defaultError,
       };
+  }
+}
+
+// ---- Utility Functions ----
+export function getUserFriendlyMessage(errorModel: ApiErrorModel): string {
+  // Return user-friendly messages based on error codes
+  switch (errorModel.code) {
+    case ResponseCode.badRequest:
+      return "Please check your login credentials and try again.";
+    case ResponseCode.unauthorised:
+      return "Invalid email or password. Please try again.";
+    case ResponseCode.forbidden:
+      return "Access denied. Please contact support if this continues.";
+    case ResponseCode.notFound:
+      return "Service not available. Please try again later.";
+    case ResponseCode.internalServerError:
+      return "Server error. Please try again in a few minutes.";
+    case ResponseCode.noInternetConnection:
+      return "No internet connection. Please check your network and try again.";
+    case ResponseCode.connectTimeout:
+    case ResponseCode.receiveTimeout:
+      return "Connection timeout. Please check your internet and try again.";
+    default:
+      return (
+        errorModel.message || "An unexpected error occurred. Please try again."
+      );
   }
 }

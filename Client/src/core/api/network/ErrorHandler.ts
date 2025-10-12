@@ -8,7 +8,6 @@ import type { ApiErrorModel } from "@/core/api/network/DataSource";
 
 export class ErrorHandler {
   apiErrorModel: ApiErrorModel;
-  static handleAxiosError: any;
 
   constructor(error: unknown) {
     if (axios.isAxiosError(error)) {
@@ -76,9 +75,27 @@ export class ErrorHandler {
   }
 
   static handle(error: unknown): ApiErrorModel {
+    const handler = new ErrorHandler(error);
+    const errorModel = handler.apiErrorModel;
+
+    // Log error details to console for debugging
+    console.group("🚨 API Error Handled");
+    console.error("Status Code:", errorModel.code);
+    console.error("Message:", errorModel.message);
+
+    // Log original error details if it's an axios error
     if (axios.isAxiosError(error)) {
-      return this.handleAxiosError(error);
+      console.error("URL:", error.config?.url);
+      console.error("Method:", error.config?.method?.toUpperCase());
+      console.error("Response Status:", error.response?.status);
+      console.error("Response Data:", error.response?.data);
+      console.error("Request Data:", error.config?.data);
+    } else {
+      console.error("Original Error:", error);
     }
-    return getFailure(DataSource.DefaultError);
+
+    console.groupEnd();
+
+    return errorModel;
   }
 }

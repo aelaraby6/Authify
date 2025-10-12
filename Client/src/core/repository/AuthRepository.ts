@@ -7,6 +7,7 @@ import type {
   ForgetPasswordResponse,
 } from "@/core/models/AuthModel";
 import { ErrorHandler } from "../api/network/ErrorHandler";
+import { getUserFriendlyMessage } from "@/core/api/network/DataSource";
 
 export class AuthRepository {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
@@ -14,8 +15,9 @@ export class AuthRepository {
       const response = await AuthApi.login(credentials);
       return response;
     } catch (error) {
-      ErrorHandler.handle(error);
-      throw error;
+      const errorModel = ErrorHandler.handle(error);
+      const userMessage = getUserFriendlyMessage(errorModel);
+      throw new Error(userMessage);
     }
   }
 

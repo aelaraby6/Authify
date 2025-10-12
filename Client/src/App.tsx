@@ -2,15 +2,6 @@ import "reflect-metadata";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { AuthService } from "./core/services/Auth.service";
-
-async function handleClick() {
-  const response = await AuthService.login(
-    "ahmedalinaguib33@gmail.com",
-    "test1234"
-  );
-  console.log(response);
-}
 
 function App() {
   return (
@@ -25,7 +16,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={handleClick}>Click me</button>
+        <button>Click me</button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
