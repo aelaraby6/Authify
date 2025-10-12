@@ -12,6 +12,8 @@ export const DataSource = {
   CacheError: "CacheError",
   NoInternetConnection: "NoInternetConnection",
   DefaultError: "DefaultError",
+  CorsError: "CorsError", // ***
+  PreflightFailed: "PreflightFailed", // (OPTIONS request failed)
 } as const;
 
 export type DataSource = (typeof DataSource)[keyof typeof DataSource];
@@ -31,6 +33,8 @@ export const ResponseCode = {
   cacheError: -5,
   noInternetConnection: -6,
   defaultError: -7,
+  corsError: -8, // ***
+  preflightFailed: -9, // ***
 } as const;
 
 // ---- Response Messages ----
@@ -48,6 +52,8 @@ export const ResponseMessage = {
   cacheError: "Cache error occurred.",
   noInternetConnection: "No internet connection.",
   defaultError: "An unexpected error occurred.",
+  corsError: "CORS policy error. The request was blocked by the browser.", // ***
+  preflightFailed: "CORS preflight request failed.", // ***
 } as const;
 
 // ---- ApiErrorModel ----
@@ -56,7 +62,7 @@ export interface ApiErrorModel {
   message: string;
 }
 
-// ---- Extension Equivalent ----
+// ---- getFailure ----
 export function getFailure(source: DataSource): ApiErrorModel {
   switch (source) {
     case DataSource.NoContent:
@@ -113,6 +119,16 @@ export function getFailure(source: DataSource): ApiErrorModel {
         code: ResponseCode.noInternetConnection,
         message: ResponseMessage.noInternetConnection,
       };
+    case DataSource.CorsError:
+      return {
+        code: ResponseCode.corsError,
+        message: ResponseMessage.corsError,
+      }; // ✅
+    case DataSource.PreflightFailed:
+      return {
+        code: ResponseCode.preflightFailed,
+        message: ResponseMessage.preflightFailed,
+      }; // ✅
     case DataSource.DefaultError:
     default:
       return {
@@ -122,9 +138,8 @@ export function getFailure(source: DataSource): ApiErrorModel {
   }
 }
 
-// ---- Utility Functions ----
+// ---- User Friendly Message ----
 export function getUserFriendlyMessage(errorModel: ApiErrorModel): string {
-  // Return user-friendly messages based on error codes
   switch (errorModel.code) {
     case ResponseCode.badRequest:
       return "Please check your login credentials and try again.";
@@ -141,6 +156,10 @@ export function getUserFriendlyMessage(errorModel: ApiErrorModel): string {
     case ResponseCode.connectTimeout:
     case ResponseCode.receiveTimeout:
       return "Connection timeout. Please check your internet and try again.";
+    case ResponseCode.corsError:
+      return "The server didn’t allow this request. Please check CORS settings or contact support."; // ***
+    case ResponseCode.preflightFailed:
+      return "The browser blocked this request due to a failed CORS preflight check."; // ***
     default:
       return (
         errorModel.message || "An unexpected error occurred. Please try again."

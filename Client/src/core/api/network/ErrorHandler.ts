@@ -33,12 +33,27 @@ export class ErrorHandler {
       return getFailure(DataSource.Cancel);
     }
 
-    // No internet / DNS / Network error
+    // 🔥 CORS-related errors
+    if (
+      !error.response &&
+      (error.message.includes("Network Error") ||
+        error.message.toLowerCase().includes("cors") ||
+        error.message.toLowerCase().includes("blocked"))
+    ) {
+      // If it's a failed preflight (OPTIONS) request
+      if (error.config?.method?.toLowerCase() === "options") {
+        return getFailure(DataSource.PreflightFailed);
+      }
+      // General CORS block
+      return getFailure(DataSource.CorsError);
+    }
+
+    // No internet / DNS / Network error (without CORS)
     if (!error.response) {
       return getFailure(DataSource.NoInternetConnection);
     }
 
-    // HTTP status based handling
+    // HTTP status-based handling
     switch (error.response.status) {
       case 400:
         return getFailure(DataSource.BadRequest);
@@ -52,7 +67,7 @@ export class ErrorHandler {
         return getFailure(DataSource.InternalServerError);
     }
 
-    // Try parse backend error (if it returns structured JSON)
+    // Try to parse backend error (if structured JSON)
     try {
       const data = error.response.data;
       if (data && typeof data === "object") {

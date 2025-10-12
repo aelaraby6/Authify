@@ -10,12 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "axios": "^1.12.2",
     "class-transformer": "^0.5.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-hook-form": "^7.65.0",
     "reflect-metadata": "^0.2.2",
-    "ts-retrofit": "^1.19.0"
+    "ts-retrofit": "^1.19.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
