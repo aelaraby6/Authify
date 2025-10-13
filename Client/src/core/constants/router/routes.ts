@@ -1,5 +1,7 @@
 export class AuthRoutes {
   public static SIGNUP = "/signup";
+  public static SIGNUP_GOOGLE = "/google";
+  public static SIGNUP_GITHUB = "/github";
   public static LOGIN = "/login";
   public static STATUS = "/status";
   public static FORGET_PASSWORD = "/forgot-password";
