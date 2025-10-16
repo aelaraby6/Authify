@@ -147,48 +147,68 @@ export const logoutController = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.user) {
-    return res.status(200).json({ message: "Not Authenticated", data: null });
-  }
-
   try {
-    req.logout((err) => {
-      if (err) {
-        console.error("Passport logout error:", err);
-        return res
-          .status(401)
-          .json({ message: "Unauthorized user", error: err });
-      }
-
-      res.clearCookie("accessToken", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
+    // Check if user is authenticated (either session or OAuth)
+    if (!req.user && !req.headers.authorization) {
+      return res.status(200).json({
+        success: true,
+        message: "Already logged out",
+        data: null,
       });
+    }
 
-      res.clearCookie("refreshToken", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
+    // Handle session-based logout (includes OAuth users with sessions)
+    if (req.user) {
+      req.logout((err) => {
+        if (err) {
+          console.error("Passport logout error:", err);
+          return res.status(500).json({
+            success: false,
+            message: "Error during logout",
+            error: err.message,
+          });
+        }
       });
+    }
 
+    // Clear all authentication cookies
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict" as const,
+      path: "/",
+    };
+
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
+    res.clearCookie("connect.sid", cookieOptions); // Express session cookie
+
+    // Destroy session if it exists
+    if (req.session) {
       req.session.destroy((sessionErr) => {
         if (sessionErr) {
           console.error("Session destruction error:", sessionErr);
           return res.status(500).json({
+            success: false,
             message: "Error destroying session",
-            error: sessionErr,
+            error: sessionErr.message,
           });
         }
 
         res.status(200).json({
-          message: "Logout successfully",
+          success: true,
+          message: "Logout successful",
           data: null,
         });
       });
-    });
+    } else {
+      // No session to destroy
+      res.status(200).json({
+        success: true,
+        message: "Logout successful",
+        data: null,
+      });
+    }
   } catch (error) {
     console.error("Logout error:", error);
     next(error);

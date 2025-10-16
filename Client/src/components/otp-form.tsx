@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,18 +20,18 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
+import { AuthService } from "@/core/services/Auth.service";
+
 export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
-  const { forgotPasswordEmail, setOtpVerified } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Full OTP value:", otp);
-    // Navigate to reset password page after OTP verification
+    //TODO refactor to get only otp
+    await AuthService.verifyOtp("ahmedalinaguib33@gmail.com", otp);
     if (otp.length === 6) {
-      // Mark OTP as verified in context
-      setOtpVerified(true);
       navigate("/reset-password");
     }
   };
@@ -41,15 +40,7 @@ export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
     <Card {...props}>
       <CardHeader>
         <CardTitle>Enter verification code</CardTitle>
-        <CardDescription>
-          We sent a 6-digit code to{" "}
-          {forgotPasswordEmail ? (
-            <strong>{forgotPasswordEmail}</strong>
-          ) : (
-            "your email"
-          )}
-          .
-        </CardDescription>
+        <CardDescription>We sent a 6-digit code to your email.</CardDescription>
       </CardHeader>
 
       <CardContent>

@@ -5,68 +5,35 @@ import ForgotPasswordPage from "@/Pages/ForgotPasswordPage";
 import OTPPage from "@/Pages/OTP";
 import ResetPasswordPage from "@/Pages/ResetPassword";
 import DashboardPage from "@/Pages/Dashboard";
-import { ProtectedRoute, PublicRoute } from "@/components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <PublicRoute>
-        <LoginPage />
-      </PublicRoute>
-    ),
+    element: <LoginPage />,
   },
   {
     path: "/login",
-    element: (
-      <PublicRoute>
-        <LoginPage />
-      </PublicRoute>
-    ),
+    element: <LoginPage />,
   },
   {
     path: "/signup",
-    element: (
-      <PublicRoute>
-        <SignupPage />
-      </PublicRoute>
-    ),
+    element: <SignupPage />,
   },
   {
     path: "/forgot-password",
-    element: (
-      <PublicRoute>
-        <ForgotPasswordPage />
-      </PublicRoute>
-    ),
+    element: <ForgotPasswordPage />,
   },
   {
     path: "/otp",
-    element: (
-      <PublicRoute>
-        <ProtectedRoute requireEmail>
-          <OTPPage />
-        </ProtectedRoute>
-      </PublicRoute>
-    ),
+    element: <OTPPage />,
   },
   {
     path: "/reset-password",
-    element: (
-      <PublicRoute>
-        <ProtectedRoute requireEmail requireOtpVerification>
-          <ResetPasswordPage />
-        </ProtectedRoute>
-      </PublicRoute>
-    ),
+    element: <ResetPasswordPage />,
   },
   {
     path: "/dashboard",
-    element: (
-      <ProtectedRoute requireAuth>
-        <DashboardPage />
-      </ProtectedRoute>
-    ),
+    element: <DashboardPage />,
   },
 ]);
 

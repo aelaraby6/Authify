@@ -97,6 +97,16 @@ class ApiService extends BaseService {
   async reset2FA(@Body _body: Reset2FARequest): Promise<SimpleMessageResponse> {
     return {} as SimpleMessageResponse;
   }
+
+  @GET(AuthRoutes.SIGNUP_GOOGLE)
+  async signUpWithGoogle(): Promise<any> {
+    return {} as any;
+  }
+
+  @GET(AuthRoutes.SIGNUP_GITHUB)
+  async signUpWithGithub(): Promise<any> {
+    return {} as any;
+  }
 }
 
 const baseAuthApi = new ServiceBuilder().build(ApiService);
@@ -160,6 +170,16 @@ export const AuthApi = {
 
   async reset2FA(data: Reset2FARequest): Promise<SimpleMessageResponse> {
     const response = await baseAuthApi.reset2FA(data);
+    return (response as any).data || response;
+  },
+
+  async signUpWithGoogle() {
+    const response = await baseAuthApi.signUpWithGoogle();
+    return (response as any).data || response;
+  },
+  
+  async signUpWithGithub() {
+    const response = await baseAuthApi.signUpWithGithub();
     return (response as any).data || response;
   },
 };

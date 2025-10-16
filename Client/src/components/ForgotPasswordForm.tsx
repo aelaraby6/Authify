@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,6 +15,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { AuthService } from "@/core/services/Auth.service";
 
 export function ForgotPasswordForm({
   ...props
@@ -23,18 +23,18 @@ export function ForgotPasswordForm({
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
-  const { setForgotPasswordEmail } = useAuth();
 
   // Simple email validation
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (!isValidEmail) return;
+    // Call the AuthService to send the reset email
+    await AuthService.forgetPassword(email);
     console.log("Password reset email sent to:", email);
 
     // Store email in auth context for the flow
-    setForgotPasswordEmail(email);
     setSubmitted(true);
 
     // Navigate to OTP page after a short delay

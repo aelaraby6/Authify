@@ -1,4 +1,3 @@
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,11 +7,45 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function DashboardPage() {
-  const { logout } = useAuth();
+import { AuthService } from "@/core/services/Auth.service";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { setAccessToken } from "@/core/utils/auth.utils";
 
-  const handleLogout = () => {
-    logout();
+export default function DashboardPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    // Handle OAuth redirect parameters
+    const token = searchParams.get("token");
+    const authStatus = searchParams.get("auth");
+
+    if (token && authStatus === "success") {
+      // Store the token using utility function
+      setAccessToken(token);
+
+      // Clear the URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      console.log("OAuth authentication successful");
+    }
+  }, [searchParams]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await AuthService.logout();
+      console.log("Logout successful");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Even if logout fails, redirect to login (since we cleared local storage)
+      navigate("/login");
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -31,8 +64,12 @@ export default function DashboardPage() {
                 This is a protected route that can only be accessed by
                 authenticated users.
               </p>
-              <Button onClick={handleLogout} className="w-full">
-                Logout
+              <Button
+                onClick={handleLogout}
+                className="w-full"
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? "Logging out..." : "Logout"}
               </Button>
             </div>
           </CardContent>

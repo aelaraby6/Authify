@@ -11,6 +11,7 @@ import {
   TwoFAVerifyResponse,
   VerifyOtpResponse,
 } from "../models/AuthModel";
+import { clearAuthStorage } from "../utils/auth.utils";
 
 const repo = new AuthRepository();
 
@@ -34,7 +35,21 @@ export class AuthService {
   }
 
   static async logout(): Promise<LogoutResponse> {
-    return repo.logout();
+    try {
+      // Call the backend logout endpoint
+      const result = await repo.logout();
+
+      // Clear all authentication storage using utility function
+      clearAuthStorage();
+
+      return result;
+    } catch (error) {
+      // Even if the backend call fails, clear local storage
+      clearAuthStorage();
+
+      // Re-throw the error for the caller to handle
+      throw error;
+    }
   }
 
   static async forgetPassword(email: string): Promise<ForgetPasswordResponse> {
@@ -95,5 +110,15 @@ export class AuthService {
   ): Promise<SimpleMessageResponse> {
     const result = await repo.reset2FA(credentials);
     return result;
+  }
+
+  static async signUpWithGoogle() {
+    // Redirect directly to Google OAuth URL
+    window.location.href = "http://localhost:3000/api/auth/google";
+  }
+
+  static async signUpWithGithub() {
+    // Redirect directly to GitHub OAuth URL
+    window.location.href = "http://localhost:3000/api/auth/github";
   }
 }

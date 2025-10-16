@@ -105,7 +105,9 @@ router.get(
 
 router.get(
   "/github/callback",
-  passport.authenticate("github", { failureRedirect: "/login" }),
+  passport.authenticate("github", {
+    failureRedirect: "http://localhost:5173/login?error=github_auth_failed",
+  }),
   (req, res) => {
     const { accessToken, refreshToken, user }: any = req.user;
 
@@ -115,12 +117,10 @@ router.get(
       sameSite: "strict",
     });
 
-    res.status(200).json({
-      success: true,
-      message: "GitHub login successful",
-      accessToken,
-      user,
-    });
+    // Redirect to client with success and token in URL params
+    res.redirect(
+      `http://localhost:5173/dashboard?token=${accessToken}&auth=success`
+    );
   }
 );
 
@@ -134,7 +134,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login",
+    failureRedirect: "http://localhost:5173/login?error=google_auth_failed",
     session: false,
   }),
   async (req, res) => {
@@ -147,15 +147,13 @@ router.get(
         sameSite: "strict",
       });
 
-      res.status(200).json({
-        success: true,
-        message: "Google login successful",
-        accessToken,
-        user,
-      });
+      // Redirect to client with success and token in URL params
+      res.redirect(
+        `http://localhost:5173/dashboard?token=${accessToken}&auth=success`
+      );
     } catch (error) {
       console.error("Error in Google callback:", error);
-      res.status(500).json({ success: false, message: "Google login failed" });
+      res.redirect("http://localhost:5173/login?error=google_auth_failed");
     }
   }
 );

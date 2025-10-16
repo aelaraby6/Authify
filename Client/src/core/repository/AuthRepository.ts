@@ -130,4 +130,24 @@ export class AuthRepository {
       throw error;
     }
   }
+
+  async signUpWithGoogle(){
+    try {
+      const response = await AuthApi.signUpWithGoogle();
+      return response;
+    } catch (error) {
+      ErrorHandler.handle(error);
+      throw error;
+    }
+  }
+  
+  async signUpWithGithub(){
+    try {
+      const response = await AuthApi.signUpWithGithub();
+      return response;
+    } catch (error) {
+      ErrorHandler.handle(error);
+      throw error;
+    }
+  }
 }

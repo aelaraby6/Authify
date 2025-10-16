@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,6 +15,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { AuthService } from "@/core/services/Auth.service";
 
 export function ResetPasswordForm({
   ...props
@@ -24,27 +24,20 @@ export function ResetPasswordForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
-  const { forgotPasswordEmail, setForgotPasswordEmail, setOtpVerified } =
-    useAuth();
 
   const isValid = password.length >= 8 && password === confirmPassword;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
+    //TODO refactor to get only password and confirmPassword
+    await AuthService.resetPassword("" , "" , password , confirmPassword)
     console.log(
       "Password reset for:",
-      forgotPasswordEmail,
       "new password:",
       password
     );
     setSubmitted(true);
-
-    // Clear the password reset flow state
-    setForgotPasswordEmail(null);
-    setOtpVerified(false);
-
-    // Navigate back to login after successful reset
     setTimeout(() => {
       navigate("/login", { replace: true });
     }, 2000);

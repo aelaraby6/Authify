@@ -14,19 +14,23 @@ import cookieParser from "cookie-parser";
 
 const app: Application = express();
 
-// Middlewares
-app.use(cors(corsOptions));
+/* ---------- 🔹 1. Security & CORS ---------- */
 app.use(helmet());
-app.use(express.json({limit: '100mb'}));
-app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+app.use(cors(corsOptions));
 
-app.use(session(loadSessionConfig()));
+/* ---------- 🔹 2. Body Parsing ---------- */
+app.use(express.json({ limit: "100mb" }));
+app.use(express.urlencoded({ extended: true, limit: "100mb" }));
 
+/* ---------- 🔹 3. Cookies & Sessions ---------- */
+app.use(cookieParser());
+app.use(session(loadSessionConfig())); // Must come after cookieParser
+
+/* ---------- 🔹 4. Passport ---------- */
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cookieParser());
-
+/* ---------- 🔹 5. Routes ---------- */
 app.use("/api", ApiRouter);
 
 // 404 Not Found Middleware
