@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,14 +23,31 @@ export function ResetPasswordForm({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
+  const { forgotPasswordEmail, setForgotPasswordEmail, setOtpVerified } =
+    useAuth();
 
   const isValid = password.length >= 8 && password === confirmPassword;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
-    console.log("Password reset to:", password);
+    console.log(
+      "Password reset for:",
+      forgotPasswordEmail,
+      "new password:",
+      password
+    );
     setSubmitted(true);
+
+    // Clear the password reset flow state
+    setForgotPasswordEmail(null);
+    setOtpVerified(false);
+
+    // Navigate back to login after successful reset
+    setTimeout(() => {
+      navigate("/login", { replace: true });
+    }, 2000);
   };
 
   return (
@@ -79,9 +98,18 @@ export function ResetPasswordForm({
               Reset Password
             </Button>
 
+            <div className="text-center">
+              <Link
+                to="/otp"
+                className="text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
+              >
+                ← Back to Verification
+              </Link>
+            </div>
+
             {submitted && (
               <p className="text-green-600 text-sm text-center mt-2">
-                ✅ Password successfully reset!
+                ✅ Password successfully reset! Redirecting to login...
               </p>
             )}
           </FieldGroup>

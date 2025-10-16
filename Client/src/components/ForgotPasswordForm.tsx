@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,6 +22,8 @@ export function ForgotPasswordForm({
 }: React.ComponentProps<typeof Card>) {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
+  const { setForgotPasswordEmail } = useAuth();
 
   // Simple email validation
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -28,7 +32,15 @@ export function ForgotPasswordForm({
     e.preventDefault();
     if (!isValidEmail) return;
     console.log("Password reset email sent to:", email);
+
+    // Store email in auth context for the flow
+    setForgotPasswordEmail(email);
     setSubmitted(true);
+
+    // Navigate to OTP page after a short delay
+    setTimeout(() => {
+      navigate("/otp");
+    }, 1500);
   };
 
   return (
@@ -62,9 +74,19 @@ export function ForgotPasswordForm({
               Send Reset Link
             </Button>
 
+            <div className="text-center">
+              <Link
+                to="/login"
+                className="text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
+              >
+                ← Back to Login
+              </Link>
+            </div>
+
             {submitted && (
               <p className="text-green-600 text-sm text-center mt-2">
-                ✅ Reset link sent! Check your inbox.
+                ✅ Reset link sent! Check your inbox. Redirecting to
+                verification...
               </p>
             )}
           </FieldGroup>
