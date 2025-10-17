@@ -11,6 +11,7 @@ export const clearAuthStorage = (): void => {
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
   localStorage.removeItem("userProfile");
+  localStorage.removeItem("authProvider");
 
   // Clear sessionStorage
   sessionStorage.clear();
@@ -61,4 +62,25 @@ export const getStoredUser = (): any | null => {
  */
 export const setStoredUser = (user: any): void => {
   localStorage.setItem("user", JSON.stringify(user));
+};
+
+/**
+ * Store authentication provider (local, github, google)
+ */
+export const setAuthProvider = (provider: string): void => {
+  localStorage.setItem("authProvider", provider);
+};
+
+/**
+ * Get authentication provider
+ */
+export const getAuthProvider = (): string | null => {
+  return localStorage.getItem("authProvider");
+};
+
+/**
+ * Check if user logged in with GitHub
+ */
+export const isGithubAuth = (): boolean => {
+  return getAuthProvider() === "github";
 };

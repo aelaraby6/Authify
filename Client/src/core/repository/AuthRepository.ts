@@ -59,6 +59,15 @@ export class AuthRepository {
     }
   }
 
+  async revokeGithubAuth() {
+    try {
+      return AuthApi.revokeGithubAuth();
+    } catch (error) {
+      ErrorHandler.handle(error);
+      throw error;
+    }
+  }
+
   async forgetPassword(
     credentials: ForgetPasswordRequest
   ): Promise<ForgetPasswordResponse> {
@@ -131,7 +140,7 @@ export class AuthRepository {
     }
   }
 
-  async signUpWithGoogle(){
+  async signUpWithGoogle() {
     try {
       const response = await AuthApi.signUpWithGoogle();
       return response;
@@ -140,8 +149,8 @@ export class AuthRepository {
       throw error;
     }
   }
-  
-  async signUpWithGithub(){
+
+  async signUpWithGithub() {
     try {
       const response = await AuthApi.signUpWithGithub();
       return response;

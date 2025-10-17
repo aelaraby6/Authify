@@ -10,7 +10,7 @@ import {
 import { AuthService } from "@/core/services/Auth.service";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { setAccessToken } from "@/core/utils/auth.utils";
+import { setAccessToken, setAuthProvider } from "@/core/utils/auth.utils";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -21,10 +21,17 @@ export default function DashboardPage() {
     // Handle OAuth redirect parameters
     const token = searchParams.get("token");
     const authStatus = searchParams.get("auth");
+    const provider = searchParams.get("provider");
 
     if (token && authStatus === "success") {
       // Store the token using utility function
       setAccessToken(token);
+
+      // Store the authentication provider if available
+      if (provider) {
+        setAuthProvider(provider);
+        console.log(`OAuth authentication successful with ${provider}`);
+      }
 
       // Clear the URL parameters
       window.history.replaceState({}, document.title, window.location.pathname);

@@ -53,6 +53,11 @@ class ApiService extends BaseService {
     return {} as LogoutResponse;
   }
 
+  @POST("/github/revoke")
+  async revokeGithubAuth(): Promise<SimpleMessageResponse> {
+    return {} as SimpleMessageResponse;
+  }
+
   // --- Password Reset ---
   @POST(AuthRoutes.FORGET_PASSWORD)
   async forgetPassword(
@@ -177,9 +182,14 @@ export const AuthApi = {
     const response = await baseAuthApi.signUpWithGoogle();
     return (response as any).data || response;
   },
-  
+
   async signUpWithGithub() {
     const response = await baseAuthApi.signUpWithGithub();
+    return (response as any).data || response;
+  },
+
+  async revokeGithubAuth(): Promise<SimpleMessageResponse> {
+    const response = await baseAuthApi.revokeGithubAuth();
     return (response as any).data || response;
   },
 };

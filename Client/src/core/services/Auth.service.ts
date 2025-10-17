@@ -11,7 +11,11 @@ import {
   TwoFAVerifyResponse,
   VerifyOtpResponse,
 } from "../models/AuthModel";
-import { clearAuthStorage } from "../utils/auth.utils";
+import {
+  clearAuthStorage,
+  isGithubAuth,
+  setAuthProvider,
+} from "../utils/auth.utils";
 
 const repo = new AuthRepository();
 
@@ -22,11 +26,15 @@ export class AuthService {
     password: string
   ): Promise<AuthResponse> {
     const result = await repo.register({ name, email, password });
+    // Set auth provider for local registration
+    setAuthProvider("local");
     return result;
   }
 
   static async login(email: string, password: string): Promise<AuthResponse> {
     const result = await repo.login({ email, password });
+    // Set auth provider for local login
+    setAuthProvider("local");
     return result;
   }
 
@@ -36,6 +44,18 @@ export class AuthService {
 
   static async logout(): Promise<LogoutResponse> {
     try {
+      // Check if user logged in with GitHub and revoke authorization if so
+      if (isGithubAuth()) {
+        try {
+          console.log("Revoking GitHub authorization...");
+          await repo.revokeGithubAuth();
+          console.log("GitHub authorization revoked successfully");
+        } catch (error) {
+          console.warn("Failed to revoke GitHub authorization:", error);
+          // Continue with logout even if revocation fails
+        }
+      }
+
       // Call the backend logout endpoint
       const result = await repo.logout();
 
@@ -119,6 +139,19 @@ export class AuthService {
 
   static async signUpWithGithub() {
     // Redirect directly to GitHub OAuth URL
+    window.location.href = "http://localhost:3000/api/auth/github";
+  }
+
+  static async forceGithubReauth() {
+    try {
+      // First revoke GitHub authorization
+      await repo.revokeGithubAuth();
+      console.log("GitHub authorization revoked, redirecting to fresh auth...");
+    } catch (error) {
+      console.warn("Failed to revoke GitHub authorization:", error);
+    }
+
+    // Then redirect to GitHub OAuth (will show consent screen)
     window.location.href = "http://localhost:3000/api/auth/github";
   }
 }
