@@ -21,19 +21,22 @@ import {
 } from "@/components/ui/input-otp";
 
 import { AuthService } from "@/core/services/Auth.service";
+import { useAuth } from "@/core/context/AuthContext";
 
 export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const [otp, setOtp] = useState("");
+  const [otp, setOtpLocal] = useState("");
   const navigate = useNavigate();
+  const { email, setOtp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Full OTP value:", otp);
-    //TODO refactor to get only otp
-    await AuthService.verifyOtp("ahmedalinaguib33@gmail.com", otp);
-    if (otp.length === 6) {
-      navigate("/reset-password");
-    }
+
+    if (otp.length !== 6) return;
+
+    await AuthService.verifyOtp(email, otp);
+    setOtp(otp);
+    navigate("/reset-password");
   };
 
   return (
@@ -54,7 +57,7 @@ export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
                 id="otp"
                 required
                 value={otp}
-                onChange={(value) => setOtp(value)}
+                onChange={(value) => setOtpLocal(value)}
               >
                 <InputOTPGroup className="gap-2.5 *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border">
                   <InputOTPSlot index={0} />

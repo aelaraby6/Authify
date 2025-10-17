@@ -16,28 +16,28 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { AuthService } from "@/core/services/Auth.service";
+import { useAuth } from "@/core/context/AuthContext";
 
 export function ForgotPasswordForm({
   ...props
 }: React.ComponentProps<typeof Card>) {
-  const [email, setEmail] = useState("");
+  const [email, setEmailLocal] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const { setEmail } = useAuth(); // ***
   const navigate = useNavigate();
 
-  // Simple email validation
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValidEmail) return;
-    // Call the AuthService to send the reset email
+
     await AuthService.forgetPassword(email);
+    setEmail(email); // **
     console.log("Password reset email sent to:", email);
 
-    // Store email in auth context for the flow
     setSubmitted(true);
 
-    // Navigate to OTP page after a short delay
     setTimeout(() => {
       navigate("/otp");
     }, 1500);
@@ -62,7 +62,7 @@ export function ForgotPasswordForm({
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmailLocal(e.target.value)}
                 required
               />
               <FieldDescription>

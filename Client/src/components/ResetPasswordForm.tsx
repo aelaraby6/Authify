@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { AuthService } from "@/core/services/Auth.service";
+import { useAuth } from "@/core/context/AuthContext";
 
 export function ResetPasswordForm({
   ...props
@@ -24,23 +25,28 @@ export function ResetPasswordForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
+  const { email, otp } = useAuth();
 
   const isValid = password.length >= 8 && password === confirmPassword;
 
-  const handleSubmit = async(e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
-    //TODO refactor to get only password and confirmPassword
-    await AuthService.resetPassword("" , "" , password , confirmPassword)
-    console.log(
-      "Password reset for:",
-      "new password:",
-      password
-    );
-    setSubmitted(true);
-    setTimeout(() => {
-      navigate("/login", { replace: true });
-    }, 2000);
+
+    try {
+      await AuthService.resetPassword(email, otp, password, confirmPassword);
+
+      console.log("Password reset successfully for:", email);
+
+      setSubmitted(true);
+
+      setTimeout(() => {
+        navigate("/login", { replace: true });
+      }, 2000);
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      alert("Something went wrong. Try again later.");
+    }
   };
 
   return (
@@ -102,7 +108,7 @@ export function ResetPasswordForm({
 
             {submitted && (
               <p className="text-green-600 text-sm text-center mt-2">
-                ✅ Password successfully reset! Redirecting to login...
+                Password successfully reset! Redirecting to login...
               </p>
             )}
           </FieldGroup>
