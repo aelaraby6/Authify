@@ -419,7 +419,7 @@ The React application serves as a testing environment for the authentication mod
 
 ## 👥 Contributors
 
-Thanks goes to these wonderful people in the frontend team:
+Thanks goes to these wonderful people in the team:
 
 <table>
   <tr>
