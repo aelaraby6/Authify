@@ -14,6 +14,9 @@ A comprehensive authentication module built with Express.js, TypeScript, and Rea
 - [Authentication Flow](#authentication-flow)
 - [Security Features](#security-features)
 
+<img width="1101" height="897" alt="use-case" src="https://github.com/user-attachments/assets/e531234c-b76f-4050-8a90-3549b8f5eb1f" />
+
+
 ## ✨ Features
 
 ### Core Authentication
@@ -38,6 +41,9 @@ A comprehensive authentication module built with Express.js, TypeScript, and Rea
 - **Error Handling** - Comprehensive global error handling
 - **CORS Configuration** - Secure cross-origin resource sharing
 - **Helmet Integration** - Enhanced API security headers
+
+<img width="1178" height="787" alt="password-reset" src="https://github.com/user-attachments/assets/c1e73332-3b69-40ce-bb06-eeaddc3a2cbe" />
+
 
 ## 🛠 Technology Stack
 
@@ -240,6 +246,9 @@ FRONTEND_URL=http://localhost:5173
 ## 📚 API Documentation
 
 API documentation is available at `/docs` endpoint using Swagger UI.
+
+<img width="1456" height="897" alt="swagger" src="https://github.com/user-attachments/assets/65d0aba6-e3f1-472f-b388-25c18007385f" />
+
 
 ### Main Endpoints
 
