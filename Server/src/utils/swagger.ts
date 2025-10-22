@@ -5,13 +5,13 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "",
+      title: "Authify",
       version: "1.0.0",
-      description: "",
+      description: "API documentation for Authify",
     },
     servers: [
       {
-        url: "http://localhost:4000",
+        url: "http://localhost:3000",
       },
     ],
     components: {
@@ -25,9 +25,9 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: ["./docs/**/*.js"], 
-
+apis: ["./src/docs/**/*.ts"]
 }
+
 
 
 const swaggerSpec = swaggerJsdoc(options);

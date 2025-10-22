@@ -10,9 +10,13 @@ import passport from 'passport';
 import "@/config/passportConfig";
 import { loadSessionConfig } from "@/helper/sessionhelper";
 import cookieParser from "cookie-parser";
+import { swaggerSpec, swaggerUi } from "./utils/swagger";
 
 
 const app: Application = express();
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 /* ---------- 🔹 1. Security & CORS ---------- */
 app.use(helmet());
