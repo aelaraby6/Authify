@@ -422,7 +422,7 @@ Thanks goes to these wonderful people in the frontend team:
     </td>
     <td align="center">
       <a href="https://github.com/ahmedali109">
-        <img src="https://avatars.githubusercontent.com/u/223935419?v=4" width="100px;" alt=""/>
+        <img src="https://avatars.githubusercontent.com/u/64106924?v=4" width="100px;" alt=""/>
         <br /><sub><b>Ahmed Ali</b></sub>
       </a>
     </td>
