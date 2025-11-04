@@ -2,18 +2,6 @@
 
 A comprehensive authentication module built with Express.js, TypeScript, and React, providing secure user authentication with multiple features including OAuth integration, 2FA, and password management.
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [API Documentation](#api-documentation)
-- [Authentication Flow](#authentication-flow)
-- [Security Features](#security-features)
-
 <img width="1101" height="897" alt="use-case" src="https://github.com/user-attachments/assets/e531234c-b76f-4050-8a90-3549b8f5eb1f" />
 
 
@@ -249,45 +237,6 @@ API documentation is available at `/docs` endpoint using Swagger UI.
 
 <img width="1456" height="897" alt="swagger" src="https://github.com/user-attachments/assets/65d0aba6-e3f1-472f-b388-25c18007385f" />
 
-
-### Main Endpoints
-
-#### Authentication Routes (`/api/auth`)
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/signup` | Register new user | No |
-| POST | `/login` | User login | No |
-| GET | `/status` | Check auth status | Session |
-| POST | `/logout` | User logout | No |
-
-#### Password Management
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/forgot-password` | Request password reset OTP | No |
-| POST | `/verify-reset-otp` | Verify OTP code | No |
-| POST | `/reset-password` | Reset password with OTP | No |
-| POST | `/update-password` | Update password | Token |
-
-#### Two-Factor Authentication
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/2FA/setup` | Setup 2FA | Session |
-| POST | `/2FA/verify` | Verify 2FA token | Session |
-| POST | `/2FA/reset` | Reset 2FA | Session |
-
-#### OAuth Routes
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/github` | Initiate GitHub OAuth |
-| GET | `/github/callback` | GitHub OAuth callback |
-| POST | `/github/revoke` | Revoke GitHub authorization |
-| GET | `/google` | Initiate Google OAuth |
-| GET | `/google/callback` | Google OAuth callback |
-
 ## 🔄 Authentication Flow
 
 ### 1. Standard Email/Password Flow
@@ -352,70 +301,10 @@ Login with 2FA:
 5. Access granted if valid
 ```
 
-## 🔒 Security Features
-
-### Password Security
-- Passwords hashed with bcrypt (10 salt rounds)
-- Minimum password length enforcement
-- Password strength validation
-- Secure password reset with OTP
-
-### Token Security
-- JWT with short expiration (1 hour for access tokens)
-- Refresh tokens with 7-day expiration
-- HttpOnly cookies for refresh tokens
-- Secure flag enabled in production
-
-### Rate Limiting
-- Signup endpoint: Limited requests per IP
-- Login endpoint: Brute force protection
-- Configurable rate limits per endpoint
-
-### Session Security
-- Secure session configuration
-- Session timeout
-- Session regeneration on login
-- CSRF protection
-
-### 2FA Security
-- TOTP-based authentication
-- 30-second time window
-- 2-step tolerance for clock skew
-- Secure secret storage
-
-### Additional Security
-- Helmet.js for security headers
-- CORS configuration
-- Input validation and sanitization
-- SQL injection prevention (via MongoDB)
-- XSS protection
-
-## 📱 Frontend Routes
-
-| Route | Component | Description |
-|-------|-----------|-------------|
-| `/` | LoginPage | Landing page (redirects to login) |
-| `/login` | LoginPage | User login |
-| `/signup` | SignupPage | User registration |
-| `/forgot-password` | ForgotPasswordPage | Password reset request |
-| `/otp` | OTPPage | OTP verification |
-| `/reset-password` | ResetPasswordPage | New password entry |
-| `/dashboard` | DashboardPage | Protected user dashboard |
-
 ## 🧪 Testing
 
 The React application serves as a testing environment for the authentication module. It includes forms for all authentication features with proper error handling and user feedback.
 
-## 📝 Best Practices Implemented
-
-1. **Separation of Concerns** - Controllers, services, and routes are separated
-2. **Error Handling** - Centralized error handling with custom error classes
-3. **Validation** - Input validation using schemas
-4. **Type Safety** - Full TypeScript implementation
-5. **Security First** - Multiple layers of security measures
-6. **Scalability** - Modular architecture for easy expansion
-7. **Documentation** - Swagger API documentation
-8. **Code Quality** - Consistent coding standards
 
 ## 👥 Contributors
 
